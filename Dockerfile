@@ -1,17 +1,15 @@
-# 使用带 Maven 的镜像
 FROM maven:3.8.7-eclipse-temurin-8
 
-WORKDIR /spider-flow
-
-# 拷贝项目源码
+WORKDIR /app
 COPY . .
 
-# 执行打包
-RUN mvn clean package -Dmaven.test.skip=true
+# 打包并列出 target 文件内容
+RUN mvn clean package -Dmaven.test.skip=true \
+ && ls -al spider-flow-web/target \
+ && cp spider-flow-web/target/spider-flow-web-*.jar spider-flow.jar
 
-# Render 端口设置
 ENV PORT=8080
 EXPOSE 8080
 
-# 启动应用
-CMD ["java", "-Dserver.port=$PORT", "-jar", "spider-flow-web/target/spider-flow-web-0.3.5.jar"]
+# 启动时使用已重命名的 jar
+CMD java -Dserver.port=$PORT -jar spider-flow.jar
